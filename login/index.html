@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Entrar | Admin</title>
+<meta name="theme-color" content="#0d1b2a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1b2a;--panel:#070d14;--bone:#f1ece0;--muted:#a9b6c6;--amber:#ff5c00;--green:#4ade80;--red:#ff7b7b;--line:#22364c}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--bg);color:var(--bone);font:500 14px/1.5 'Archivo',system-ui,sans-serif}
+.card{width:min(380px,100%);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:28px 26px}
+h1{font-size:1.1rem;font-weight:700;margin-bottom:4px}
+.sub{color:var(--muted);font-size:.85rem;margin-bottom:20px}
+label{display:block;font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:5px}
+input{width:100%;background:var(--bg);color:var(--bone);border:1px solid var(--line);border-radius:4px;padding:11px 12px;font:inherit;margin-bottom:14px}
+input:focus{outline:2px solid var(--amber);outline-offset:1px;border-color:var(--amber)}
+button.main{width:100%;background:var(--amber);color:#0d1b2a;border:0;border-radius:4px;padding:12px;font:700 .9rem 'Archivo',sans-serif;cursor:pointer;min-height:44px}
+button.main:hover{background:#ff8a4d}
+button.main:disabled{opacity:.6;cursor:wait}
+button.link{background:none;border:0;color:var(--muted);font:inherit;font-size:.82rem;text-decoration:underline;cursor:pointer;margin-top:14px;padding:4px 0}
+button.link:hover{color:var(--amber)}
+.faixa{border-radius:4px;padding:10px 12px;font-size:.84rem;margin-bottom:14px}
+.erro{background:rgba(255,123,123,.12);border:1px solid rgba(255,123,123,.45);color:var(--red)}
+.ok{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.4);color:var(--green)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+</style>
+</head>
+<body>
+<main class="card">
+  <h1 id="titulo">Entrar no painel</h1>
+  <p class="sub" id="sub">Área privada da Fernanda Santos.</p>
+  <div id="faixa" class="faixa" role="alert" hidden></div>
+
+  <form id="formLogin" novalidate>
+    <label for="email">E-mail</label>
+    <input id="email" type="email" autocomplete="username" required>
+    <label for="senha">Senha</label>
+    <input id="senha" type="password" autocomplete="current-password" required>
+    <button class="main" type="submit" id="btnEntrar">Entrar</button>
+    <button class="link" type="button" id="esqueci">Esqueci minha senha</button>
+  </form>
+
+  <form id="formNova" novalidate hidden>
+    <label for="nova">Nova senha (mínimo 8 caracteres)</label>
+    <input id="nova" type="password" autocomplete="new-password" minlength="8" required>
+    <button class="main" type="submit" id="btnNova">Salvar nova senha</button>
+  </form>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/banco.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var faixa = $('faixa');
+  function aviso(txt, tipo) { faixa.textContent = txt; faixa.className = 'faixa ' + (tipo || 'erro'); faixa.hidden = false; }
+  function limpa() { faixa.hidden = true; }
+
+  if (!window.sb) { aviso('Não consegui carregar o sistema de login. Confira a internet e recarregue a página.'); $('btnEntrar').disabled = true; return; }
+
+  var emRecuperacao = /type=recovery/.test(location.hash);
+
+  /* Já tem sessão aberta? Vai direto pro admin (menos no fluxo de nova senha). */
+  if (!emRecuperacao) {
+    window.sb.auth.getSession().then(function (r) {
+      if (r.data && r.data.session) location.replace('../admin/');
+    }).catch(function () {});
+  }
+
+  /* Link do e-mail de recuperação: mostra o campo de nova senha. */
+  window.sb.auth.onAuthStateChange(function (evento) {
+    if (evento === 'PASSWORD_RECOVERY') {
+      $('formLogin').hidden = true; $('formNova').hidden = false;
+      $('titulo').textContent = 'Criar nova senha'; $('sub').textContent = 'Escolha uma senha nova para entrar.';
+    }
+  });
+
+  $('formLogin').addEventListener('submit', function (e) {
+    e.preventDefault(); limpa();
+    var email = $('email').value.trim(), senha = $('senha').value;
+    if (!email || !senha) { aviso('Preencha o e-mail e a senha.'); return; }
+    var b = $('btnEntrar'); b.disabled = true; b.textContent = 'Entrando...';
+    window.sb.auth.signInWithPassword({ email: email, password: senha }).then(function (r) {
+      if (r.error) {
+        var falhaRede = /fetch|network|failed/i.test(r.error.message || '');
+        aviso(falhaRede ? 'Não consegui conectar. Confira a internet e tente de novo.' : 'E-mail ou senha incorretos');
+        b.disabled = false; b.textContent = 'Entrar';
+      } else { location.replace('../admin/'); }
+    }).catch(function () {
+      aviso('Não consegui conectar. Confira a internet e tente de novo.');
+      b.disabled = false; b.textContent = 'Entrar';
+    });
+  });
+
+  $('esqueci').addEventListener('click', function () {
+    limpa();
+    var email = $('email').value.trim();
+    if (!email) { aviso('Escreva o seu e-mail no campo acima e clique de novo em "Esqueci minha senha".'); $('email').focus(); return; }
+    var volta = new URL('./', location.href).href;
+    window.sb.auth.resetPasswordForEmail(email, { redirectTo: volta }).then(function (r) {
+      if (r.error) aviso('Não consegui enviar agora. Espere um minuto e tente de novo.');
+      else aviso('Se esse e-mail estiver cadastrado, você vai receber o link para criar uma nova senha.', 'ok');
+    }).catch(function () { aviso('Não consegui conectar. Confira a internet e tente de novo.'); });
+  });
+
+  $('formNova').addEventListener('submit', function (e) {
+    e.preventDefault(); limpa();
+    var nova = $('nova').value;
+    if (nova.length < 8) { aviso('A senha precisa ter pelo menos 8 caracteres.'); return; }
+    window.sb.auth.updateUser({ password: nova }).then(function (r) {
+      if (r.error) aviso('Não consegui salvar a nova senha. Peça um novo link e tente de novo.');
+      else { aviso('Senha alterada! Entrando...', 'ok'); setTimeout(function () { location.replace('../admin/'); }, 900); }
+    }).catch(function () { aviso('Não consegui conectar. Confira a internet e tente de novo.'); });
+  });
+})();
+</script>
+</body>
+</html>

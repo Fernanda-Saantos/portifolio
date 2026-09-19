@@ -43,6 +43,10 @@ h2{font-weight:900;font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.05;letter-sp
 .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%}
 .ph .cap{position:relative;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;background:rgba(7,13,20,.85);color:var(--amber);padding:5px 9px;margin:10px;border-radius:3px}
 
+.work-b h3 a{text-decoration:none}
+.work-b h3 a:hover{color:var(--amber)}
+.erro-form{color:#ff7b7b;font-family:var(--f-mono);font-size:.85rem;margin-bottom:12px}
+
 /* reveal */
 .js .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease;transition-delay:var(--d,0s)}
 .js .reveal.in{opacity:1;transform:none}
@@ -341,11 +345,12 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
       <div id="formBox" class="reveal">
         <form class="card" id="form">
           <label for="cNome">Nome</label>
-          <input id="cNome" name="nome" type="text" autocomplete="name" required placeholder="Seu nome">
+          <input id="cNome" name="nome" type="text" autocomplete="name" required maxlength="200" placeholder="Seu nome">
           <label for="cEmail">E-mail</label>
-          <input id="cEmail" name="email" type="email" autocomplete="email" required placeholder="seuemail@email.com">
+          <input id="cEmail" name="email" type="email" autocomplete="email" required maxlength="200" placeholder="seuemail@email.com">
           <label for="cMsg">Mensagem</label>
-          <textarea id="cMsg" name="mensagem" required placeholder="Conte sobre a empresa, o projeto e o prazo"></textarea>
+          <textarea id="cMsg" name="mensagem" required maxlength="2500" placeholder="Conte sobre a empresa, o projeto e o prazo"></textarea>
+          <input type="text" id="cSite" name="site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
           <button class="btn btn-solid" type="submit">Enviar mensagem</button>
         </form>
       </div>
@@ -387,6 +392,7 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
   </div>
 </div>
 
+<script src="js/banco.js"></script>
 <script>
 /* =====================================================
    DADOS EDITÁVEIS: troque tudo aqui, sem mexer no HTML
@@ -433,11 +439,13 @@ const PROMISES = [
   "Entrega no prazo combinado, com documentação"
 ];
 
+/* IMPORTANTE: quando o painel (banco de dados) responde, estes dados fixos de Destaques e Projetos são
+   trocados pelos vídeos que você cadastrou no admin. Eles ficam aqui só como reserva. */
 /* Destaques (3).
    link  = endereço do projeto (LinkedIn, GitHub, Power BI publicado, vídeo). O card inteiro abre esse link.
    cover = capa vertical 9:16. Coloque o arquivo na pasta (ex: "capa1.jpg") e escreva o nome aqui.
    Os números +00% são placeholders: troque pelos seus resultados reais. */
-const HIGHLIGHTS = [
+let HIGHLIGHTS = [
   { link: "https://www.linkedin.com/in/seuusuario", cover: "", coverAlt: "Capa do projeto 1", num: "+00%", label: "menos tempo de processo", title: "Projeto de destaque 01", context: "Empresa 01 · dashboard em Power BI" },
   { link: "https://www.linkedin.com/in/seuusuario", cover: "", coverAlt: "Capa do projeto 2", num: "+00h", label: "economizadas por mês", title: "Projeto de destaque 02", context: "Empresa 02 · automação de processos" },
   { link: "https://www.linkedin.com/in/seuusuario", cover: "", coverAlt: "Capa do projeto 3", num: "+00", label: "fontes de dados integradas", title: "Projeto de destaque 03", context: "Empresa 03 · pipeline de ETL" }
@@ -445,7 +453,7 @@ const HIGHLIGHTS = [
 
 /* Projetos. niche = nome da área (os botões de filtro nascem sozinhos a partir daqui).
    cover = imagem 4:5 opcional (print do dashboard, por exemplo), igual aos destaques. */
-const WORKS = [
+let WORKS = [
   { niche: "Power BI",   title: "Projeto 01 · Empresa 01", cover: "" },
   { niche: "Power BI",   title: "Projeto 02 · Empresa 02", cover: "" },
   { niche: "SQL e ETL",  title: "Projeto 03 · Empresa 03", cover: "" },
@@ -551,8 +559,9 @@ const brandList = '<ul>' + [...BRANDS, ...BRANDS, ...BRANDS].map((b) => `<li><sv
 $('marquee').innerHTML = brandList + brandList.replace('<ul>', '<ul aria-hidden="true">');
 $('promises').innerHTML = PROMISES.map((p) => `<li class="card">${esc(p)}</li>`).join('');
 
-/* Destaques */
-$('hlGrid').innerHTML = HIGHLIGHTS.map((h, i) => `
+/* Destaques e trabalhos são desenhados por funções, para redesenhar quando o painel mandar os vídeos. */
+function desenharDestaques() {
+  $('hlGrid').innerHTML = HIGHLIGHTS.map((h, i) => `
   <!-- LINK DO PROJETO: vai no href abaixo (campo link). CAPA 9:16: campo cover. -->
   <a class="card hl reveal" style="--d:${i * .1}s" href="${esc(h.link)}" target="_blank" rel="noopener" aria-label="Ver projeto: ${esc(h.title)}">
     <div class="ph" style="--h:${200 + i * 45}" data-cover="${i}"><span class="play" aria-hidden="true"></span></div>
@@ -561,27 +570,30 @@ $('hlGrid').innerHTML = HIGHLIGHTS.map((h, i) => `
       <h3>${esc(h.title)}</h3><p>${esc(h.context)}</p>
     </div>
   </a>`).join('');
-document.querySelectorAll('[data-cover]').forEach((el) => {
-  const h = HIGHLIGHTS[el.dataset.cover];
-  if (h.cover) el.insertAdjacentHTML('afterbegin', `<img src="${esc(h.cover)}" alt="${esc(h.coverAlt)}" loading="lazy" decoding="async">`);
-  else el.insertAdjacentHTML('beforeend', '<span class="cap">capa do projeto 9:16</span>');
-});
-
-/* Trabalhos e filtros */
-const niches = ['Todos', ...new Set(WORKS.map((w) => w.niche))];
-$('filters').innerHTML = niches.map((n, i) => `<button class="chip" type="button" aria-pressed="${i === 0}" data-n="${esc(n)}">${esc(n)}</button>`).join('');
-$('works').innerHTML = WORKS.map((w, i) => `
+  document.querySelectorAll('[data-cover]').forEach((el) => {
+    const h = HIGHLIGHTS[el.dataset.cover];
+    if (h.cover) el.insertAdjacentHTML('afterbegin', `<img src="${esc(h.cover)}" alt="${esc(h.coverAlt)}" loading="lazy" decoding="async">`);
+    else el.insertAdjacentHTML('beforeend', '<span class="cap">capa do projeto 9:16</span>');
+  });
+}
+function desenharTrabalhos() {
+  const niches = ['Todos', ...new Set(WORKS.map((w) => w.niche))];
+  $('filters').innerHTML = niches.map((n, i) => `<button class="chip" type="button" aria-pressed="${i === 0}" data-n="${esc(n)}">${esc(n)}</button>`).join('');
+  $('works').innerHTML = WORKS.map((w, i) => `
   <article class="card work" data-niche="${esc(w.niche)}">
     <div class="ph" style="--h:${(i * 47) % 360}" data-w="${i}"></div>
-    <div class="work-b"><small>${esc(w.niche)}</small><h3>${esc(w.title)}</h3></div>
+    <div class="work-b"><small>${esc(w.niche)}</small><h3>${w.link ? `<a href="${esc(w.link)}" target="_blank" rel="noopener">${esc(w.title)}</a>` : esc(w.title)}</h3></div>
   </article>`).join('');
-document.querySelectorAll('[data-w]').forEach((el) => {
-  const w = WORKS[el.dataset.w];
-  media(el, w.cover, 'Projeto: ' + w.title, 'imagem do projeto 4:5');
-});
+  document.querySelectorAll('[data-w]').forEach((el) => {
+    const w = WORKS[el.dataset.w];
+    media(el, w.cover, 'Projeto: ' + w.title, 'imagem do projeto 4:5');
+  });
+}
+desenharDestaques();
+desenharTrabalhos();
 $('filters').addEventListener('click', (e) => {
   const b = e.target.closest('.chip'); if (!b) return;
-  document.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', c === b));
+  document.querySelectorAll('#filters .chip').forEach((c) => c.setAttribute('aria-pressed', c === b));
   document.querySelectorAll('.work').forEach((w) => {
     const show = b.dataset.n === 'Todos' || w.dataset.niche === b.dataset.n;
     w.hidden = !show;
@@ -643,13 +655,74 @@ function toggleMenu(open) {
 burger.addEventListener('click', () => toggleMenu(!menu.classList.contains('open')));
 menu.addEventListener('click', (e) => { if (e.target.closest('a')) toggleMenu(false); });
 
-/* Formulário de contato */
-$('form').addEventListener('submit', (e) => {
+/* =====================================================
+   LIGAÇÃO COM O PAINEL (Supabase)
+   Lê os vídeos, recebe o formulário de contato e conta as visitas.
+   Se o banco falhar, o site continua normal com os dados do começo do script.
+   ===================================================== */
+function bd(caminho, opcoes) {
+  if (!window.BANCO) return Promise.reject(new Error('sem banco'));
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 8000);
+  const o = opcoes || {};
+  return fetch(window.BANCO.url + '/rest/v1/' + caminho, Object.assign({ signal: ctl.signal }, o, { headers: Object.assign({ apikey: window.BANCO.chave, 'Content-Type': 'application/json' }, o.headers || {}) })).finally(() => clearTimeout(t));
+}
+const linkSeguro = (u) => /^https?:\/\//i.test(String(u || '')) ? u : '';
+
+/* Vídeos: o que você cadastra no admin aparece aqui sozinho. */
+(async function carregarVideosDoBanco() {
+  try {
+    const r = await bd('videos?select=*&visivel=eq.true&order=ordem.asc');
+    if (!r.ok) return;
+    const linhas = (await r.json()).filter((v) => v && v.titulo && !/^\(exemplo\)/i.test(v.titulo));
+    if (!linhas.length) return;
+    const com = linhas.filter((v) => String(v.destaque || '').trim()).slice(0, 3);
+    if (com.length) {
+      HIGHLIGHTS = com.map((v) => { const pt = String(v.destaque).trim().split(/\s+/); return { link: linkSeguro(v.link) || '#destaques', cover: linkSeguro(v.capa), coverAlt: 'Capa do vídeo ' + v.titulo, num: pt[0], label: pt.slice(1).join(' '), title: v.titulo, context: [v.marca, v.nicho].filter(Boolean).join(' · ') }; });
+      desenharDestaques();
+    }
+    WORKS = linhas.map((v) => ({ niche: String(v.nicho || '').trim() || 'Outros', title: v.titulo + (v.marca ? ' · ' + v.marca : ''), cover: linkSeguro(v.capa), link: linkSeguro(v.link) }));
+    desenharTrabalhos();
+    document.querySelectorAll('.reveal:not(.in)').forEach((el) => io.observe(el));
+  } catch (e) { /* sem banco: fica o que já está na tela */ }
+})();
+
+/* Formulário de contato: a pessoa entra na tabela "marcas" como Lead. */
+$('form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const nome = esc($('cNome').value.trim().split(' ')[0]);
-  $('formBox').innerHTML = `<div class="ok" role="status" tabindex="-1"><strong>Mensagem enviada, ${nome}!</strong><p>Obrigada pelo contato. Respondo em até 24 horas úteis.</p></div>`;
+  if ($('cSite').value) return; /* isca anti-spam preenchida por robô */
+  const form = e.target, btn = form.querySelector('button[type=submit]');
+  const antigo = form.querySelector('.erro-form'); if (antigo) antigo.remove();
+  const nome = $('cNome').value.trim(), hoje = new Date();
+  btn.disabled = true; btn.textContent = 'Enviando...';
+  try {
+    const r = await bd('marcas', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ nome: nome, email: $('cEmail').value.trim(), obs: $('cMsg').value.trim(), situacao: 'lead', ultimo_contato: hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0') + '-' + String(hoje.getDate()).padStart(2, '0') }) });
+    if (!r.ok) throw new Error('falhou');
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'Enviar mensagem';
+    btn.insertAdjacentHTML('beforebegin', '<p class="erro-form" role="alert">Não consegui enviar agora. Tente pelo WhatsApp, e-mail ou Instagram ao lado.</p>');
+    return;
+  }
+  $('formBox').innerHTML = `<div class="ok" role="status" tabindex="-1"><strong>Mensagem enviada, ${esc(nome.split(' ')[0])}!</strong><p>Obrigada pelo contato. Respondo em até 24 horas úteis.</p></div>`;
   $('formBox').querySelector('.ok').focus();
 });
+
+/* Registro simples de visita: uma por sessão, sem serviço de fora e sem pedir nada ao visitante.
+   Não conta quando você abre o arquivo no computador (localhost). */
+(function registrarVisita() {
+  const h = location.hostname;
+  if (!/^https?:$/.test(location.protocol) || /^(localhost|127\.0\.0\.1)$/.test(h)) return;
+  try { if (sessionStorage.getItem('visita-registrada')) return; sessionStorage.setItem('visita-registrada', '1'); } catch (e) { /* segue */ }
+  function origem() {
+    const q = new URLSearchParams(location.search), u = q.get('utm_source') || q.get('origem');
+    if (u) return u.slice(0, 60);
+    let host = ''; try { host = new URL(document.referrer).hostname.replace(/^www\./, ''); } catch (e) { /* sem referência */ }
+    if (!host || host === h) return 'Direto';
+    const mapa = [['instagram', 'Instagram'], ['google', 'Google'], ['linkedin', 'LinkedIn'], ['facebook', 'Facebook'], ['whatsapp', 'WhatsApp'], ['wa.me', 'WhatsApp'], ['github', 'GitHub'], ['youtube', 'YouTube'], ['tiktok', 'TikTok'], ['bing', 'Bing'], ['t.co', 'X'], ['twitter', 'X']];
+    for (const [k, n] of mapa) if (host.includes(k)) return n;
+    return host.slice(0, 60);
+  }
+  bd('visitas', { method: 'POST', headers: { Prefer: 'return=minimal' }, keepalive: true, body: JSON.stringify({ pagina: (location.pathname || '/').slice(0, 200), origem: origem() }) }).catch(() => {});
+})();
 
 /* Card de captura: aparece após 7 segundos, uma vez por visita */
 (function capture() {
