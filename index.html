@@ -13,7 +13,7 @@
 <style>
 :root{
   --bg:#0d1b2a; --panel:#070d14; --panel2:#0a141f; --bone:#f1ece0; --muted:#a9b6c6;
-  --amber:#ffc857; --green:#4ade80; --line:#22364c;
+  --amber:#ff5c00; --green:#4ade80; --line:#22364c;
   --f-title:'Archivo',system-ui,sans-serif; --f-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
   --head-h:96px;
 }
@@ -32,12 +32,12 @@ section{scroll-margin-top:var(--head-h)}
 .kicker::before{content:"";width:28px;height:2px;background:var(--amber)}
 h2{font-weight:900;font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.05;letter-spacing:-.02em;margin-bottom:36px;max-width:22ch}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;transition:border-color .25s,box-shadow .25s,transform .25s}
-.card:hover,.card:focus-within{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber),0 12px 30px -12px rgba(255,200,87,.35)}
+.card:hover,.card:focus-within{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber),0 12px 30px -12px rgba(255,92,0,.35)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f-mono);font-weight:600;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;padding:14px 22px;border-radius:4px;border:2px solid var(--amber);cursor:pointer;transition:background .2s,color .2s;min-height:48px}
 .btn-solid{background:var(--amber);color:#0d1b2a}
-.btn-solid:hover{background:#ffd98a}
+.btn-solid:hover{background:#ff8a4d}
 .btn-line{background:transparent;color:var(--amber)}
-.btn-line:hover{background:rgba(255,200,87,.12)}
+.btn-line:hover{background:rgba(255,92,0,.12)}
 .ph{position:relative;display:flex;align-items:flex-end;justify-content:flex-start;overflow:hidden;background:linear-gradient(145deg,hsl(var(--h,210) 45% 22%),hsl(calc(var(--h,210) + 40) 55% 12%))}
 .ph::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.04) 0 2px,transparent 2px 14px)}
 .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -109,7 +109,7 @@ header.top{position:fixed;inset:0 0 auto 0;z-index:50;background:rgba(7,13,20,.9
 .hl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .hl{display:block;text-decoration:none;overflow:hidden}
 .hl .ph{aspect-ratio:9/16;border-radius:0}
-.play{position:absolute;inset:0;margin:auto;width:72px;height:72px;border-radius:50%;background:var(--amber);display:grid;place-items:center;box-shadow:0 0 0 8px rgba(255,200,87,.25);transition:transform .25s}
+.play{position:absolute;inset:0;margin:auto;width:72px;height:72px;border-radius:50%;background:var(--amber);display:grid;place-items:center;box-shadow:0 0 0 8px rgba(255,92,0,.25);transition:transform .25s}
 .play::before{content:"";margin-left:5px;border-left:22px solid #0d1b2a;border-block:13px solid transparent}
 .hl:hover .play,.hl:focus-visible .play{transform:scale(1.1)}
 .hl-body{padding:20px 20px 24px;border-top:1px solid var(--line)}
