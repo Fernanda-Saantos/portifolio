@@ -272,7 +272,7 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
     </div>
   </div>
 </section>
-<div class="brands" aria-label="Empresas atendidas">
+<div class="brands" aria-label="Ferramentas que eu uso">
   <div class="marquee" id="marquee"></div>
 </div>
 
@@ -414,8 +414,8 @@ const HERO_STATS = [
   { value: "+00",  label: "processos automatizados" }
 ];
 
-/* Empresas da faixa (Empresa 01 a Empresa 12). */
-const BRANDS = ["Empresa 01","Empresa 02","Empresa 03","Empresa 04","Empresa 05","Empresa 06","Empresa 07","Empresa 08","Empresa 09","Empresa 10","Empresa 11","Empresa 12"];
+/* Ferramentas da faixa (aparecem repetidas para a faixa rolar sem buracos). */
+const BRANDS = ["GitHub","Excel","Power BI","Office 365","SQL","Python"];
 
 /* Três promessas da seção Sobre. */
 const PROMISES = [
@@ -538,7 +538,7 @@ media($('aboutPhoto'), CREATOR.photo, CREATOR.photoAlt, 'foto 4:5');
 
 /* Estatísticas da capa, marcas, promessas */
 $('heroStats').innerHTML = HERO_STATS.map((s) => `<div class="card stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join('');
-const brandList = '<ul>' + BRANDS.map((b) => `<li>${esc(b)}</li>`).join('') + '</ul>';
+const brandList = '<ul>' + [...BRANDS, ...BRANDS, ...BRANDS].map((b) => `<li>${esc(b)}</li>`).join('') + '</ul>';
 $('marquee').innerHTML = brandList + brandList.replace('<ul>', '<ul aria-hidden="true">');
 $('promises').innerHTML = PROMISES.map((p) => `<li class="card">${esc(p)}</li>`).join('');
 
