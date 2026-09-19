@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FERNANDA SANTOS | Portfólio UGC</title>
-<meta name="description" content="Portfólio de FERNANDA SANTOS, UGC creator: vídeos autênticos, cortes para anúncio e conteúdo que vende para marcas.">
+<title>FERNANDA SANTOS | Portfólio de Dados</title>
+<meta name="description" content="Portfólio de FERNANDA SANTOS, analista de dados: Power BI, SQL, ETL e automação de processos para decisões melhores.">
 <meta name="theme-color" content="#0d1b2a">
 <script>document.documentElement.classList.add('js');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,7 +40,7 @@ h2{font-weight:900;font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.05;letter-sp
 .btn-line:hover{background:rgba(255,92,0,.12)}
 .ph{position:relative;display:flex;align-items:flex-end;justify-content:flex-start;overflow:hidden;background:linear-gradient(145deg,hsl(var(--h,210) 45% 22%),hsl(calc(var(--h,210) + 40) 55% 12%))}
 .ph::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.04) 0 2px,transparent 2px 14px)}
-.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%}
 .ph .cap{position:relative;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;background:rgba(7,13,20,.85);color:var(--amber);padding:5px 9px;margin:10px;border-radius:3px}
 
 /* reveal */
@@ -256,7 +256,7 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
 <section class="hero" id="inicio">
   <div class="wrap hero-grid">
     <div>
-      <p class="lead">Embarque imediato · UGC Creator</p>
+      <p class="lead">Embarque imediato · Analista de Dados</p>
       <h1 class="board" id="board" aria-label="FERNANDA SANTOS"></h1>
       <p class="sub" id="heroSub"></p>
       <div class="cta">
@@ -267,12 +267,12 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
     </div>
     <div class="photo-wrap">
       <!-- FOTO: para trocar, coloque o arquivo da imagem na mesma pasta (ex: foto.jpg) e escreva "foto.jpg" em CREATOR.photo no começo do script. Formato ideal 4:5. -->
-      <div class="tag" aria-hidden="true"><span>Bagagem · UGC</span><strong id="tagCity">SUA CIDADE</strong><span>Voo 0001</span><i></i></div>
+      <div class="tag" aria-hidden="true"><span>Bagagem · Dados</span><strong id="tagCity">SUA CIDADE</strong><span>Voo 0001</span><i></i></div>
       <div class="ph photo reveal" id="heroPhoto" style="--h:210"></div>
     </div>
   </div>
 </section>
-<div class="brands" aria-label="Marcas atendidas">
+<div class="brands" aria-label="Empresas atendidas">
   <div class="marquee" id="marquee"></div>
 </div>
 
@@ -282,9 +282,9 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
     <div class="ph photo reveal" id="aboutPhoto" style="--h:190"></div>
     <div class="reveal">
       <p class="kicker">01 · Sobre mim</p>
-      <h2>Oi, eu sou a pessoa por trás da câmera.</h2>
-      <p>Eu transformo o seu produto em um vídeo que parece recomendação de amiga. Testo de verdade, conto do meu jeito e cuido de cada detalhe para o conteúdo soar natural e vender.</p>
-      <p>Trabalho com carinho e com prazo combinado, para que você só precise aprovar e publicar.</p>
+      <h2>Oi, eu transformo dados em decisão.</h2>
+      <p>Eu pego dados espalhados e bagunçados e entrego painéis, modelos e automações que fazem sentido para o seu negócio. Trabalho com Power BI, SQL, Python e ETL, sempre pensando no que a sua equipe precisa decidir.</p>
+      <p>Explico cada etapa com clareza e com prazo combinado, para você só precisar validar e usar.</p>
       <ul class="promises" id="promises"></ul>
       <span class="sign" id="sign">FERNANDA SANTOS</span>
     </div>
@@ -294,8 +294,8 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
 <!-- 3. DESTAQUES -->
 <section class="sec" id="destaques">
   <div class="wrap">
-    <p class="kicker">02 · Conteúdos de destaque</p>
-    <h2>Os voos que mais decolaram.</h2>
+    <p class="kicker">02 · Projetos de destaque</p>
+    <h2>Os projetos que mais geraram resultado.</h2>
     <div class="hl-grid" id="hlGrid"></div>
   </div>
 </section>
@@ -303,9 +303,9 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
 <!-- 4. TRABALHOS -->
 <section class="sec" id="trabalhos">
   <div class="wrap">
-    <p class="kicker">03 · Trabalhos por nicho</p>
+    <p class="kicker">03 · Projetos por área</p>
     <h2>Escolha o destino e veja o que já entreguei.</h2>
-    <div class="filters" id="filters" role="group" aria-label="Filtrar trabalhos por nicho"></div>
+    <div class="filters" id="filters" role="group" aria-label="Filtrar projetos por área"></div>
     <div class="works" id="works" aria-live="polite"></div>
   </div>
 </section>
@@ -314,7 +314,7 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
 <section class="sec" id="servicos">
   <div class="wrap">
     <p class="kicker">04 · Como eu te ajudo</p>
-    <h2>Seis serviços para a sua marca decolar.</h2>
+    <h2>Seis serviços para os seus dados decolarem.</h2>
     <div class="svc" id="svc"></div>
   </div>
 </section>
@@ -345,7 +345,7 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
           <label for="cEmail">E-mail</label>
           <input id="cEmail" name="email" type="email" autocomplete="email" required placeholder="seuemail@email.com">
           <label for="cMsg">Mensagem</label>
-          <textarea id="cMsg" name="mensagem" required placeholder="Conte sobre a marca, o produto e o prazo"></textarea>
+          <textarea id="cMsg" name="mensagem" required placeholder="Conte sobre a empresa, o projeto e o prazo"></textarea>
           <button class="btn btn-solid" type="submit">Enviar mensagem</button>
         </form>
       </div>
@@ -375,7 +375,7 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
     <button class="close" id="mClose" aria-label="Fechar">&times;</button>
     <div id="mBody">
       <h2 id="mTitle">Quer meu mídia kit completo?</h2>
-      <p>Deixe seu nome e e-mail que eu envio valores, formatos e prazos.</p>
+      <p>Deixe seu nome e e-mail que eu envio meus serviços, projetos e prazos.</p>
       <form id="mForm">
         <label for="mNome">Nome</label>
         <input id="mNome" type="text" autocomplete="name" required placeholder="Seu nome">
@@ -392,93 +392,93 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
    DADOS EDITÁVEIS: troque tudo aqui, sem mexer no HTML
    ===================================================== */
 
-/* Dados da creator. Para usar foto real, escreva o nome do arquivo em photo (ex: "foto.jpg", formato 4:5). */
+/* Dados da Fernanda. Para usar foto real, escreva o nome do arquivo em photo (ex: "foto.jpg", formato 4:5). */
 const CREATOR = {
   name: "FERNANDA SANTOS",
   city: "SUA CIDADE",
   handle: "@seuusuario",
   tagline: "Análise de Dados | Engenharia de Dados | Business Intelligence | Data Analytics | Automação de Processos | SQL | ETL | Modelagem de Dados | Visualização de Dados | Insights Estratégicos | Data Driven IA",
-  photo: "",            // foto da creator 4:5
-  photoAlt: "Retrato de FERNANDA SANTOS, UGC creator",
+  photo: "foto.jpg",   // troque o arquivo foto.jpg (formato 4:5 ou quadrado)
+  photoAlt: "Retrato de Fernanda Santos, analista de dados, sorrindo em frente a telas com dashboards",
   whatsapp: "(00) 00000-0000",   // só o número aparece; o link usa apenas os dígitos
   email: "seuemail@email.com",
   instagram: "https://instagram.com/seuusuario",
-  tiktok: "https://tiktok.com/@seuusuario",
-  youtube: "https://youtube.com/@seuusuario"
+  linkedin: "https://www.linkedin.com/in/seuusuario",
+  github: "https://github.com/seuusuario"
 };
 
 /* Três números da capa (texto livre). Troque pelos seus. */
 const HERO_STATS = [
-  { value: "+000", label: "vídeos entregues" },
-  { value: "+00",  label: "marcas atendidas" },
-  { value: "+0M",  label: "views somadas" }
+  { value: "+000", label: "projetos entregues" },
+  { value: "+00",  label: "dashboards publicados" },
+  { value: "+00",  label: "processos automatizados" }
 ];
 
-/* Marcas da faixa (Marca 01 a Marca 12). */
-const BRANDS = ["Marca 01","Marca 02","Marca 03","Marca 04","Marca 05","Marca 06","Marca 07","Marca 08","Marca 09","Marca 10","Marca 11","Marca 12"];
+/* Empresas da faixa (Empresa 01 a Empresa 12). */
+const BRANDS = ["Empresa 01","Empresa 02","Empresa 03","Empresa 04","Empresa 05","Empresa 06","Empresa 07","Empresa 08","Empresa 09","Empresa 10","Empresa 11","Empresa 12"];
 
 /* Três promessas da seção Sobre. */
 const PROMISES = [
-  "Roteiro aprovado antes de gravar",
+  "Escopo e indicadores alinhados antes de começar",
   "Uma rodada de ajuste inclusa",
-  "Entrega em até 72 horas úteis"
+  "Entrega no prazo combinado, com documentação"
 ];
 
 /* Destaques (3).
-   link  = endereço do vídeo (Reels, TikTok, YouTube). O card inteiro abre esse link.
+   link  = endereço do projeto (LinkedIn, GitHub, Power BI publicado, vídeo). O card inteiro abre esse link.
    cover = capa vertical 9:16. Coloque o arquivo na pasta (ex: "capa1.jpg") e escreva o nome aqui.
-   Os números +2,4M etc. são apenas exemplos: troque pelos seus. */
+   Os números +00% são placeholders: troque pelos seus resultados reais. */
 const HIGHLIGHTS = [
-  { link: "https://instagram.com/seuusuario", cover: "", coverAlt: "Capa do vídeo 1", num: "+2,4M", label: "views no reels", title: "Título do conteúdo 01", context: "Marca 01 · lançamento de produto" },
-  { link: "https://instagram.com/seuusuario", cover: "", coverAlt: "Capa do vídeo 2", num: "+180K", label: "views no tiktok", title: "Título do conteúdo 02", context: "Marca 02 · rotina e primeiras impressões" },
-  { link: "https://instagram.com/seuusuario", cover: "", coverAlt: "Capa do vídeo 3", num: "+95K", label: "views no shorts", title: "Título do conteúdo 03", context: "Marca 03 · unboxing e teste real" }
+  { link: "https://www.linkedin.com/in/seuusuario", cover: "", coverAlt: "Capa do projeto 1", num: "+00%", label: "menos tempo de processo", title: "Projeto de destaque 01", context: "Empresa 01 · dashboard em Power BI" },
+  { link: "https://www.linkedin.com/in/seuusuario", cover: "", coverAlt: "Capa do projeto 2", num: "+00h", label: "economizadas por mês", title: "Projeto de destaque 02", context: "Empresa 02 · automação de processos" },
+  { link: "https://www.linkedin.com/in/seuusuario", cover: "", coverAlt: "Capa do projeto 3", num: "+00", label: "fontes de dados integradas", title: "Projeto de destaque 03", context: "Empresa 03 · pipeline de ETL" }
 ];
 
-/* Trabalhos. niche = nome do nicho (os botões de filtro nascem sozinhos a partir daqui).
-   cover = imagem 4:5 opcional, igual aos destaques. */
+/* Projetos. niche = nome da área (os botões de filtro nascem sozinhos a partir daqui).
+   cover = imagem 4:5 opcional (print do dashboard, por exemplo), igual aos destaques. */
 const WORKS = [
-  { niche: "Beleza",   title: "Trabalho 01 · Marca 01", cover: "" },
-  { niche: "Beleza",   title: "Trabalho 02 · Marca 02", cover: "" },
-  { niche: "Moda",     title: "Trabalho 03 · Marca 03", cover: "" },
-  { niche: "Moda",     title: "Trabalho 04 · Marca 04", cover: "" },
-  { niche: "Casa",     title: "Trabalho 05 · Marca 05", cover: "" },
-  { niche: "Casa",     title: "Trabalho 06 · Marca 06", cover: "" },
-  { niche: "Comida",   title: "Trabalho 07 · Marca 07", cover: "" },
-  { niche: "Tecnologia", title: "Trabalho 08 · Marca 08", cover: "" }
+  { niche: "Power BI",   title: "Projeto 01 · Empresa 01", cover: "" },
+  { niche: "Power BI",   title: "Projeto 02 · Empresa 02", cover: "" },
+  { niche: "SQL e ETL",  title: "Projeto 03 · Empresa 03", cover: "" },
+  { niche: "SQL e ETL",  title: "Projeto 04 · Empresa 04", cover: "" },
+  { niche: "Python",     title: "Projeto 05 · Empresa 05", cover: "" },
+  { niche: "Python",     title: "Projeto 06 · Empresa 06", cover: "" },
+  { niche: "Automação",  title: "Projeto 07 · Empresa 07", cover: "" },
+  { niche: "Automação",  title: "Projeto 08 · Empresa 08", cover: "" }
 ];
 
 /* Serviços (6). */
 const SERVICES = [
-  { title: "Vídeo UGC", text: "Vídeo gravado em formato vertical, com cara de conteúdo real e roteiro alinhado com a sua marca." },
-  { title: "Corte para anúncio", text: "Versões curtas, com gancho forte, prontas para rodar em tráfego pago." },
-  { title: "Fotos do produto", text: "Fotos de estilo de vida, com luz natural, para site, catálogo e redes." },
-  { title: "Unboxing", text: "A abertura do produto contada com surpresa, detalhes e primeiras impressões." },
-  { title: "Publicação no meu perfil", text: "Conteúdo postado para a minha audiência, com marcação e legenda combinadas." },
-  { title: "Pacote mensal", text: "Vários vídeos por mês, com preço melhor e calendário fixo de entregas." }
+  { title: "Dashboards em Power BI", text: "Painéis claros e bonitos, com os indicadores certos para a sua equipe acompanhar o negócio." },
+  { title: "Modelagem de dados", text: "Modelos organizados, com relações e medidas em DAX que deixam as análises rápidas e confiáveis." },
+  { title: "Engenharia de dados e ETL", text: "Pipelines que coletam, limpam e carregam os dados de várias fontes, sem trabalho manual." },
+  { title: "SQL e análises", text: "Consultas e análises que respondem às perguntas do negócio e encontram o que os números escondem." },
+  { title: "Automação de processos", text: "Rotinas e relatórios automáticos que poupam horas da equipe e reduzem erros." },
+  { title: "Consultoria mensal", text: "Acompanhamento contínuo com insights estratégicos, evolução dos painéis e suporte fixo." }
 ];
 
-/* Quatro métricas com contador. Valores de exemplo: troque pelos seus.
+/* Quatro métricas com contador. Valores de exemplo: troque pelos seus números reais.
    prefix e suffix são opcionais; decimals = casas decimais. */
 const METRICS = [
-  { value: 100, prefix: "+", suffix: "",  decimals: 0, label: "vídeos entregues" },
-  { value: 30,  prefix: "+", suffix: "",  decimals: 0, label: "marcas atendidas" },
-  { value: 5,   prefix: "+", suffix: "M", decimals: 0, label: "views somadas" },
-  { value: 98,  prefix: "",  suffix: "%", decimals: 0, label: "clientes que voltam" }
+  { value: 100, prefix: "+", suffix: "", decimals: 0, label: "projetos entregues" },
+  { value: 30,  prefix: "+", suffix: "", decimals: 0, label: "empresas atendidas" },
+  { value: 50,  prefix: "+", suffix: "", decimals: 0, label: "dashboards publicados" },
+  { value: 40,  prefix: "+", suffix: "", decimals: 0, label: "processos automatizados" }
 ];
 
 /* Três resultados de campanha (texto livre). */
 const RESULTS = [
-  { big: "+00%", text: "Descreva aqui o resultado da campanha, em uma frase.", brand: "Marca 01" },
-  { big: "0,0x", text: "Descreva aqui o resultado da campanha, em uma frase.", brand: "Marca 02" },
-  { big: "-00%", text: "Descreva aqui o resultado da campanha, em uma frase.", brand: "Marca 03" }
+  { big: "+00%", text: "Descreva aqui o resultado da campanha, em uma frase.", brand: "Empresa 01" },
+  { big: "0,0x", text: "Descreva aqui o resultado da campanha, em uma frase.", brand: "Empresa 02" },
+  { big: "-00%", text: "Descreva aqui o resultado da campanha, em uma frase.", brand: "Empresa 03" }
 ];
 
 /* Quatro depoimentos. */
 const TESTIMONIALS = [
-  { quote: "Escreva aqui o depoimento do cliente, em uma ou duas frases.", name: "Cliente 01", company: "Marca 01" },
-  { quote: "Escreva aqui o depoimento do cliente, em uma ou duas frases.", name: "Cliente 02", company: "Marca 02" },
-  { quote: "Escreva aqui o depoimento do cliente, em uma ou duas frases.", name: "Cliente 03", company: "Marca 03" },
-  { quote: "Escreva aqui o depoimento do cliente, em uma ou duas frases.", name: "Cliente 04", company: "Marca 04" }
+  { quote: "Escreva aqui o depoimento do cliente, em uma ou duas frases.", name: "Cliente 01", company: "Empresa 01" },
+  { quote: "Escreva aqui o depoimento do cliente, em uma ou duas frases.", name: "Cliente 02", company: "Empresa 02" },
+  { quote: "Escreva aqui o depoimento do cliente, em uma ou duas frases.", name: "Cliente 03", company: "Empresa 03" },
+  { quote: "Escreva aqui o depoimento do cliente, em uma ou duas frases.", name: "Cliente 04", company: "Empresa 04" }
 ];
 
 /* =====================================================
@@ -497,12 +497,12 @@ function media(el, src, alt, caption) {
 
 /* Textos básicos */
 document.querySelectorAll('#navName,#footName,#footName2,#sign').forEach((e) => e.textContent = CREATOR.name);
-document.title = CREATOR.name + ' | Portfólio UGC';
+document.title = CREATOR.name + ' | Portfólio de Dados';
 $('heroSub').textContent = CREATOR.tagline;
 $('tagCity').textContent = CREATOR.city.toUpperCase();
 $('year').textContent = new Date().getFullYear();
-media($('heroPhoto'), CREATOR.photo, CREATOR.photoAlt, 'foto da creator 4:5');
-media($('aboutPhoto'), CREATOR.photo, CREATOR.photoAlt, 'foto da creator 4:5');
+media($('heroPhoto'), CREATOR.photo, CREATOR.photoAlt, 'foto 4:5');
+media($('aboutPhoto'), CREATOR.photo, CREATOR.photoAlt, 'foto 4:5');
 
 /* Painel split-flap com o nome */
 (function board() {
@@ -544,8 +544,8 @@ $('promises').innerHTML = PROMISES.map((p) => `<li class="card">${esc(p)}</li>`)
 
 /* Destaques */
 $('hlGrid').innerHTML = HIGHLIGHTS.map((h, i) => `
-  <!-- LINK DO VÍDEO: vai no href abaixo (campo link). CAPA 9:16: campo cover. -->
-  <a class="card hl reveal" style="--d:${i * .1}s" href="${esc(h.link)}" target="_blank" rel="noopener" aria-label="Assistir: ${esc(h.title)}">
+  <!-- LINK DO PROJETO: vai no href abaixo (campo link). CAPA 9:16: campo cover. -->
+  <a class="card hl reveal" style="--d:${i * .1}s" href="${esc(h.link)}" target="_blank" rel="noopener" aria-label="Ver projeto: ${esc(h.title)}">
     <div class="ph" style="--h:${200 + i * 45}" data-cover="${i}"><span class="play" aria-hidden="true"></span></div>
     <div class="hl-body">
       <div class="big">${esc(h.num)}</div><div class="big-l">${esc(h.label)}</div>
@@ -555,7 +555,7 @@ $('hlGrid').innerHTML = HIGHLIGHTS.map((h, i) => `
 document.querySelectorAll('[data-cover]').forEach((el) => {
   const h = HIGHLIGHTS[el.dataset.cover];
   if (h.cover) el.insertAdjacentHTML('afterbegin', `<img src="${esc(h.cover)}" alt="${esc(h.coverAlt)}" loading="lazy" decoding="async">`);
-  else el.insertAdjacentHTML('beforeend', '<span class="cap">capa do vídeo 9:16</span>');
+  else el.insertAdjacentHTML('beforeend', '<span class="cap">capa do projeto 9:16</span>');
 });
 
 /* Trabalhos e filtros */
@@ -568,7 +568,7 @@ $('works').innerHTML = WORKS.map((w, i) => `
   </article>`).join('');
 document.querySelectorAll('[data-w]').forEach((el) => {
   const w = WORKS[el.dataset.w];
-  media(el, w.cover, 'Trabalho: ' + w.title, 'imagem do trabalho 4:5');
+  media(el, w.cover, 'Projeto: ' + w.title, 'imagem do projeto 4:5');
 });
 $('filters').addEventListener('click', (e) => {
   const b = e.target.closest('.chip'); if (!b) return;
@@ -597,7 +597,7 @@ const digits = CREATOR.whatsapp.replace(/\D/g, '');
 $('btnWa').href = 'https://wa.me/55' + digits;
 $('btnMail').href = 'mailto:' + CREATOR.email;
 $('btnIg').href = CREATOR.instagram;
-$('footSocial').innerHTML = [['Instagram', CREATOR.instagram], ['TikTok', CREATOR.tiktok], ['YouTube', CREATOR.youtube]]
+$('footSocial').innerHTML = [['Instagram', CREATOR.instagram], ['LinkedIn', CREATOR.linkedin], ['GitHub', CREATOR.github]]
   .map(([n, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${n} ${esc(CREATOR.handle)}</a></li>`).join('');
 
 /* Contadores animados */
