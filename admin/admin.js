@@ -100,8 +100,12 @@
   }
 
   function mostrarAvisos() {
-    const nomes = Object.keys(AVISOS);
-    $('#avisos').innerHTML = nomes.map((n) => '<div class="aviso" role="alert"><b>Atenção:</b> ' + esc(AVISOS[n]) + '</div>').join('');
+    const nomes = Object.keys(AVISOS), faltam = [], outros = [];
+    nomes.forEach((n) => { if (/^A tabela ".*" não existe/.test(AVISOS[n])) faltam.push(n); else outros.push(AVISOS[n]); });
+    let html = '';
+    if (faltam.length) html += '<div class="aviso" role="alert"><b>Atenção:</b> ' + (faltam.length === 1 ? 'a tabela "' + esc(faltam[0]) + '" não existe' : 'faltam ' + faltam.length + ' tabelas no banco (' + faltam.map(esc).join(', ') + ')') + '. Abra o Supabase, vá em <b>SQL Editor</b>, cole o conteúdo do arquivo <b>banco.sql</b> e clique em <b>Run</b>. Depois atualize esta página. Enquanto isso, o painel abre, mas não guarda nada.</div>';
+    html += outros.map((t) => '<div class="aviso" role="alert"><b>Atenção:</b> ' + esc(t) + '</div>').join('');
+    $('#avisos').innerHTML = html;
   }
 
   /* ---------- janela e formulário ---------- */
