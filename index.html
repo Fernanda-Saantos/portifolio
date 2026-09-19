@@ -92,8 +92,8 @@ header.top{position:fixed;inset:0 0 auto 0;z-index:50;background:rgba(7,13,20,.9
 .brands{border-block:1px solid var(--line);background:var(--panel);overflow:hidden;margin-top:0}
 .marquee{display:flex;width:max-content;animation:roll 40s linear infinite}
 .marquee ul{display:flex;list-style:none;flex-shrink:0}
-.marquee li{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:13px 26px;white-space:nowrap}
-.marquee li::before{content:"\25B8";color:var(--amber);margin-right:12px}
+.marquee li{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:var(--bone);padding:14px 30px;white-space:nowrap}
+.marquee li svg{color:var(--amber);flex-shrink:0}
 @keyframes roll{to{transform:translateX(-50%)}}
 
 /* sobre */
@@ -414,8 +414,17 @@ const HERO_STATS = [
   { value: "+00",  label: "processos automatizados" }
 ];
 
-/* Ferramentas da faixa (aparecem repetidas para a faixa rolar sem buracos). */
-const BRANDS = ["GitHub","Excel","Power BI","Office 365","SQL","Python"];
+/* Ferramentas da faixa. Cada uma tem nome e ícone (SVG simples, na cor do tema).
+   Para adicionar outra, copie uma linha e troque o nome e o desenho. Elas se repetem na faixa para rolar sem buracos. */
+const BRANDS = [
+  { name: "GitHub", icon: '<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" fill="currentColor"/>', box: "0 0 16 16" },
+  { name: "Excel", icon: '<rect x="1.5" y="2.5" width="21" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>', box: "0 0 24 24" },
+  { name: "Power BI", icon: '<rect x="3" y="12" width="4.5" height="9" rx="1.2" fill="currentColor"/><rect x="9.75" y="7" width="4.5" height="14" rx="1.2" fill="currentColor"/><rect x="16.5" y="2" width="4.5" height="19" rx="1.2" fill="currentColor"/>', box: "0 0 24 24" },
+  { name: "Office 365", icon: '<path d="M4 6.5L14.5 2 20 3.8v16.4L14.5 22 4 17.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14.5 2v20M4 6.5l10.5 3.2v4.6L4 17.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>', box: "0 0 24 24" },
+  { name: "SharePoint", icon: '<circle cx="14.5" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="16.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><rect x="2" y="7" width="11" height="11" rx="2" fill="currentColor"/><path d="M9.6 10.8c-.4-.5-1-.7-1.6-.7-.8 0-1.4.4-1.4 1 0 1.5 3.2.7 3.2 2.6 0 .8-.8 1.4-1.9 1.4-.7 0-1.4-.3-1.8-.8" fill="none" stroke="#070d14" stroke-width="1.3" stroke-linecap="round"/>', box: "0 0 24 24" },
+  { name: "SQL", icon: '<ellipse cx="12" cy="5.5" rx="8" ry="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" fill="none" stroke="currentColor" stroke-width="2"/>', box: "0 0 24 24" },
+  { name: "Python", icon: '<path d="M12 2.5H9a3.5 3.5 0 00-3.5 3.5v3h9.5a1.5 1.5 0 011.5 1.5V13h3V6A3.5 3.5 0 0016 2.5z" fill="currentColor" fill-opacity=".9"/><path d="M12 21.5h3a3.5 3.5 0 003.5-3.5v-3H9a1.5 1.5 0 01-1.5-1.5V11h-3v7A3.5 3.5 0 008 21.5z" fill="currentColor" fill-opacity=".6"/><circle cx="9" cy="5.6" r="1" fill="#070d14"/><circle cx="15" cy="18.4" r="1" fill="#070d14"/>', box: "0 0 24 24" }
+];
 
 /* Três promessas da seção Sobre. */
 const PROMISES = [
@@ -538,7 +547,7 @@ media($('aboutPhoto'), CREATOR.photo, CREATOR.photoAlt, 'foto 4:5');
 
 /* Estatísticas da capa, marcas, promessas */
 $('heroStats').innerHTML = HERO_STATS.map((s) => `<div class="card stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join('');
-const brandList = '<ul>' + [...BRANDS, ...BRANDS, ...BRANDS].map((b) => `<li>${esc(b)}</li>`).join('') + '</ul>';
+const brandList = '<ul>' + [...BRANDS, ...BRANDS, ...BRANDS].map((b) => `<li><svg viewBox="${b.box}" width="22" height="22" aria-hidden="true">${b.icon}</svg>${esc(b.name)}</li>`).join('') + '</ul>';
 $('marquee').innerHTML = brandList + brandList.replace('<ul>', '<ul aria-hidden="true">');
 $('promises').innerHTML = PROMISES.map((p) => `<li class="card">${esc(p)}</li>`).join('');
 
