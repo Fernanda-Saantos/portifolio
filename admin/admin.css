@@ -238,3 +238,19 @@ textarea.roteiro{width:100%;min-height:150px;background:var(--panel);border:1px 
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .ic:disabled{opacity:.25;cursor:default}
+
+/* prospecção */
+button.k{background:none;border:0;border-right:1px solid var(--line);text-align:left;cursor:pointer;color:inherit}
+button.k:hover{background:rgba(255,255,255,.03)}
+button.k.on{background:var(--amber-soft)}
+button.k.on b{color:var(--amber)}
+.p-ps-a_enviar{background:rgba(169,182,198,.14);color:var(--muted)}
+.p-ps-enviado{background:rgba(106,183,255,.14);color:var(--blue)}
+.p-ps-respondeu{background:rgba(198,151,255,.14);color:#c697ff}
+.p-ps-proposta{background:rgba(255,200,87,.14);color:var(--yellow)}
+.p-ps-fechado{background:rgba(74,222,128,.16);color:var(--green)}
+.p-ps-sem_interesse{background:rgba(255,123,123,.14);color:var(--red)}
+button.pil{cursor:pointer;font-family:inherit}
+button.pil:hover{border-color:currentColor}
+.pop{position:fixed;z-index:150;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:6px;display:flex;flex-direction:column;gap:4px;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+.pop .pil{text-align:left;padding:5px 12px}

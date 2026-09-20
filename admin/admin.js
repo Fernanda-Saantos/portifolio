@@ -68,9 +68,9 @@
   }
 
   /* ---------- dados ---------- */
-  const S = { videos: [], marcas: [], cal: [], camp: [], marcados: new Set(), visitas: [] };
+  const S = { videos: [], marcas: [], cal: [], camp: [], marcados: new Set(), visitas: [], pros: [] };
   const AVISOS = {};
-  const TABELA = { videos: 'videos', marcas: 'marcas', cal: 'calendario', camp: 'campanhas', marcados: 'marcados', visitas: 'visitas' };
+  const TABELA = { videos: 'videos', marcas: 'marcas', cal: 'calendario', camp: 'campanhas', marcados: 'marcados', visitas: 'visitas', pros: 'prospeccao' };
 
   async function carregar(chave) {
     const nome = TABELA[chave];
@@ -103,7 +103,7 @@
     const nomes = Object.keys(AVISOS), faltam = [], outros = [];
     nomes.forEach((n) => { if (/^A tabela ".*" não existe/.test(AVISOS[n])) faltam.push(n); else outros.push(AVISOS[n]); });
     let html = '';
-    if (faltam.length) html += '<div class="aviso" role="alert"><b>Atenção:</b> ' + (faltam.length === 1 ? 'a tabela "' + esc(faltam[0]) + '" não existe' : 'faltam ' + faltam.length + ' tabelas no banco (' + faltam.map(esc).join(', ') + ')') + '. Abra o Supabase, vá em <b>SQL Editor</b>, cole o conteúdo do arquivo <b>banco.sql</b> e clique em <b>Run</b>. Depois atualize esta página. Enquanto isso, o painel abre, mas não guarda nada.</div>';
+    if (faltam.length) html += '<div class="aviso" role="alert"><b>Atenção:</b> ' + (faltam.length === 1 ? 'a tabela "' + esc(faltam[0]) + '" não existe' : 'faltam ' + faltam.length + ' tabelas no banco (' + faltam.map(esc).join(', ') + ')') + '. Abra o Supabase, vá em <b>SQL Editor</b>, cole o conteúdo do arquivo <b>' + (faltam.length === 1 && faltam[0] === 'prospeccao' ? 'banco-prospeccao.sql' : 'banco.sql') + '</b> e clique em <b>Run</b>. Depois atualize esta página. Enquanto isso, o painel abre, mas não guarda nada.</div>';
     html += outros.map((t) => '<div class="aviso" role="alert"><b>Atenção:</b> ' + esc(t) + '</div>').join('');
     $('#avisos').innerHTML = html;
   }
@@ -144,7 +144,7 @@
     let el;
     if (c.tipo === 'longo') el = '<textarea id="' + id + '" name="' + c.k + '">' + esc(val) + '</textarea>';
     else if (c.tipo === 'lista') el = '<select id="' + id + '" name="' + c.k + '">' + c.opcoes.map((o) => { const ov = Array.isArray(o) ? o[0] : o, ol = Array.isArray(o) ? o[1] : o; return '<option value="' + esc(ov) + '"' + (String(ov) === String(val) ? ' selected' : '') + '>' + esc(ol) + '</option>'; }).join('') + '</select>';
-    else el = '<input id="' + id + '" name="' + c.k + '" type="' + (c.tipo === 'data' ? 'date' : c.tipo === 'numero' ? 'number' : 'text') + '"' + (c.tipo === 'numero' ? ' step="' + (c.passo || 'any') + '" min="0"' : '') + ' value="' + esc(String(val).slice(0, c.tipo === 'data' ? 10 : 9999)) + '">';
+    else el = '<input id="' + id + '" name="' + c.k + '" type="' + (c.tipo === 'data' ? 'date' : c.tipo === 'hora' ? 'time' : c.tipo === 'numero' ? 'number' : 'text') + '"' + (c.tipo === 'numero' ? ' step="' + (c.passo || 'any') + '" min="0"' : '') + ' value="' + esc(String(val).slice(0, c.tipo === 'data' ? 10 : c.tipo === 'hora' ? 5 : 9999)) + '">';
     return '<div class="f"' + st + '><label for="' + id + '">' + esc(c.label) + (c.obrig ? ' *' : '') + '</label>' + el + (c.dica ? '<p class="dica">' + esc(c.dica) + '</p>' : '') + '</div>';
   }
 
@@ -161,8 +161,8 @@
         const el = form.elements[c.k];
         let val = c.tipo === 'sim' ? el.checked : el.value.trim();
         if (c.obrig && !val) { mostraErro('Preencha o campo "' + c.label + '".'); el.focus(); return; }
-        if (c.tipo === 'numero') val = val === '' ? 0 : Number(val);
-        if (c.tipo === 'data' && val === '') val = null;
+        if (c.tipo === 'numero') val = val === '' ? (c.nulo ? null : 0) : Number(val);
+        if ((c.tipo === 'data' || c.tipo === 'hora') && val === '') val = null;
         obj[c.k] = val;
       }
       const bt = $('button[type=submit]', ov); bt.disabled = true;
@@ -588,9 +588,192 @@
   }
 
   /* =========================================================
+     PROSPECÇÃO DE ALUNOS (tabela "prospeccao")
+     ========================================================= */
+  const PST = [['a_enviar', 'A enviar'], ['enviado', 'Enviado'], ['respondeu', 'Respondeu'], ['proposta', 'Proposta'], ['fechado', 'Fechado'], ['sem_interesse', 'Sem interesse']];
+  const rotPst = (s) => (PST.find((x) => x[0] === s) || [0, s || '-'])[1];
+  const pFiltro = { q: '', sit: '', rede: '', reuniao: '' };
+  const hora5 = (h) => h ? String(h).slice(0, 5) : '';
+  const urlDe = (u) => { u = String(u || '').trim(); if (!u) return ''; if (/^https?:\/\//i.test(u)) return u; return /^[\w.-]+\.[a-z]{2,}(\/|$)/i.test(u) ? 'https://' + u : ''; };
+  const CAB_PROS = ['Nome do possível aluno', 'Link das redes sociais', 'Quantidade de seguidores', 'E-mail do aluno', 'Observações sobre a experiência do aluno', 'Rede de captação', 'Como cheguei nesta pessoa', 'Situação', 'Data da reunião', 'Horário início', 'Horário fim'];
+  const linhaCSV = (p) => [p.nome, p.link_rede_social, p.seguidores == null ? '' : p.seguidores, p.email, p.observacoes, p.rede_captacao, p.como_cheguei, rotPst(p.situacao), p.data_reuniao ? br(p.data_reuniao) : '', hora5(p.horario_inicio), hora5(p.horario_fim)];
+
+  function abrirProspecto(p) {
+    const novo = !p;
+    formulario({
+      titulo: novo ? 'Adicionar possível aluno' : 'Editar possível aluno', larga: true,
+      campos: [
+        { k: 'nome', label: 'Nome do possível aluno', obrig: true },
+        { k: 'link_rede_social', label: 'Link das redes sociais' },
+        { k: 'seguidores', label: 'Quantidade de seguidores', tipo: 'numero', passo: 1, nulo: true, meio: true },
+        { k: 'email', label: 'E-mail do aluno', meio: true, dica: 'Se não achou, escreva "não encontrado".' },
+        { k: 'rede_captacao', label: 'Rede de captação', meio: true, dica: 'Ex: LinkedIn, Instagram' },
+        { k: 'situacao', label: 'Situação', tipo: 'lista', opcoes: PST, meio: true },
+        { k: 'como_cheguei', label: 'Como cheguei nesta pessoa' },
+        { k: 'data_reuniao', label: 'Data da reunião', tipo: 'data', meio: true },
+        { k: 'horario_inicio', label: 'Horário de início', tipo: 'hora', meio: true },
+        { k: 'horario_fim', label: 'Horário de fim', tipo: 'hora', meio: true },
+        { k: 'observacoes', label: 'Observações sobre a experiência do aluno', tipo: 'longo' }
+      ],
+      valores: novo ? { situacao: 'a_enviar' } : p,
+      aoSalvar: async (obj) => {
+        if (obj.horario_inicio && obj.horario_fim && obj.horario_fim < obj.horario_inicio) return 'O horário de fim precisa ser depois do horário de início.';
+        const e = await gravar('pros', obj, novo ? null : p.id); if (e) return e;
+        await recarregar('pros'); render(); return null;
+      },
+      aoApagar: novo ? null : async () => { const e = await remover('pros', p.id); if (e) return e; await recarregar('pros'); render(); return null; }
+    });
+  }
+
+  function prosFiltrados() {
+    const q = semAcento(pFiltro.q);
+    return S.pros.filter((p) => (!pFiltro.sit || p.situacao === pFiltro.sit) && (!pFiltro.rede || String(p.rede_captacao || '').trim() === pFiltro.rede) && (!pFiltro.reuniao || (pFiltro.reuniao === 'com' ? !!p.data_reuniao : !p.data_reuniao)) && (!q || semAcento(p.nome).includes(q) || semAcento(p.email).includes(q) || semAcento(p.link_rede_social).includes(q)))
+      .sort((a, b) => String(b.criado_em).localeCompare(String(a.criado_em)));
+  }
+  function contadoresPros() {
+    const reais = S.pros.filter((p) => !isEx(p.nome)), cont = {};
+    reais.forEach((p) => { cont[p.situacao] = (cont[p.situacao] || 0) + 1; });
+    $('#pCont').innerHTML = '<button class="k' + (pFiltro.sit === '' ? ' on' : '') + '" data-cont=""><small>Total</small><b>' + reais.length + '</b></button>' +
+      PST.map((s) => '<button class="k' + (pFiltro.sit === s[0] ? ' on' : '') + '" data-cont="' + s[0] + '"><small>' + s[1] + '</small><b>' + (cont[s[0]] || 0) + '</b></button>').join('');
+  }
+  function tabelaPros() {
+    const l = prosFiltrados();
+    $('#tbPros').innerHTML = l.length === 0
+      ? '<tr><td colspan="9">' + vazio(S.pros.length ? 'Ninguém com esse filtro.' : 'Nenhum registro ainda. Clique em "Adicionar" ou em "Importar CSV".') + '</td></tr>'
+      : l.map((p) => {
+        const link = urlDe(p.link_rede_social), i = PST.findIndex((x) => x[0] === p.situacao), prox = i >= 0 && i < 4 ? PST[i + 1] : null;
+        const reu = p.data_reuniao ? br(p.data_reuniao) + (p.horario_inicio ? ' · ' + hora5(p.horario_inicio) + (p.horario_fim ? ' a ' + hora5(p.horario_fim) : '') : '') : '-';
+        return '<tr class="clicavel" data-id="' + esc(p.id) + '"><td>' + esc(p.nome) + (isEx(p.nome) ? '<span class="tag-ex">exemplo</span>' : '') + '</td><td>' + (link ? '<a href="' + esc(link) + '" target="_blank" rel="noopener" data-fora>Abrir perfil</a>' : esc(p.link_rede_social || '-')) + '</td><td class="num">' + (p.seguidores == null ? '-' : Number(p.seguidores).toLocaleString('pt-BR')) + '</td><td class="trunc">' + esc(p.email || '-') + '</td><td>' + esc(p.rede_captacao || '-') + '</td><td class="trunc">' + esc(p.como_cheguei || '-') + '</td><td style="white-space:nowrap"><button class="pil p-ps-' + esc(p.situacao) + '" data-status="' + esc(p.id) + '" aria-haspopup="menu" title="Escolher outra situação">' + esc(rotPst(p.situacao)) + ' ▾</button>' + (prox ? ' <button class="ic" data-avanca="' + prox[0] + '" aria-label="Avançar para ' + prox[1] + '" title="Avançar para ' + prox[1] + '">' + IC.up.replace('M6 15l6-6 6 6', 'M9 6l6 6-6 6') + '</button>' : '') + '</td><td style="white-space:nowrap">' + esc(reu) + '</td><td class="trunc">' + esc(p.observacoes || '-') + '</td></tr>';
+      }).join('');
+  }
+  async function mudarStatus(id, novo) {
+    const p = S.pros.find((x) => x.id === id); if (!p || p.situacao === novo) return;
+    const antes = p.situacao; p.situacao = novo; tabelaPros(); contadoresPros();
+    const e = await gravar('pros', { situacao: novo }, id);
+    if (e) { p.situacao = antes; toast(e, true); tabelaPros(); contadoresPros(); } else toast('Situação: ' + rotPst(novo));
+  }
+
+  /* menu de situações (abre ao clicar na pílula) */
+  let popAtivo = null;
+  function fechaPop() { if (popAtivo) { popAtivo.remove(); popAtivo = null; document.removeEventListener('mousedown', foraPop, true); document.removeEventListener('keydown', tecPop); } }
+  function foraPop(e) { if (popAtivo && !popAtivo.contains(e.target)) fechaPop(); }
+  function tecPop(e) { if (e.key === 'Escape') fechaPop(); }
+  function menuStatus(btn, id) {
+    fechaPop();
+    const p = S.pros.find((x) => x.id === id); if (!p) return;
+    const m = document.createElement('div'); m.className = 'pop'; m.setAttribute('role', 'menu');
+    m.innerHTML = PST.map((s) => '<button role="menuitem" class="pil p-ps-' + s[0] + '" data-v="' + s[0] + '">' + (p.situacao === s[0] ? '✓ ' : '') + s[1] + '</button>').join('');
+    document.body.appendChild(m);
+    const r = btn.getBoundingClientRect();
+    m.style.top = Math.max(8, Math.min(r.bottom + 4, innerHeight - m.offsetHeight - 8)) + 'px';
+    m.style.left = Math.max(8, Math.min(r.left, innerWidth - m.offsetWidth - 8)) + 'px';
+    m.onclick = (e) => { const b = e.target.closest('[data-v]'); if (b) { fechaPop(); mudarStatus(id, b.dataset.v); } };
+    popAtivo = m; document.addEventListener('mousedown', foraPop, true); document.addEventListener('keydown', tecPop);
+    $('button', m).focus();
+  }
+
+  /* ---------- importar CSV ---------- */
+  function lerCSV(txt) {
+    txt = txt.replace(/^﻿/, '');
+    const pri = txt.split(/\r?\n/)[0] || '', n = (c) => pri.split(c).length - 1;
+    const d = n(';') >= n(',') && n(';') >= n('\t') ? ';' : (n('\t') > n(',') ? '\t' : ',');
+    const linhas = []; let lin = [], cel = '', asp = false;
+    for (let i = 0; i < txt.length; i++) {
+      const ch = txt[i];
+      if (asp) { if (ch === '"') { if (txt[i + 1] === '"') { cel += '"'; i++; } else asp = false; } else cel += ch; }
+      else if (ch === '"') asp = true;
+      else if (ch === d) { lin.push(cel); cel = ''; }
+      else if (ch === '\n' || ch === '\r') { if (ch === '\r' && txt[i + 1] === '\n') i++; lin.push(cel); cel = ''; linhas.push(lin); lin = []; }
+      else cel += ch;
+    }
+    if (cel !== '' || lin.length) { lin.push(cel); linhas.push(lin); }
+    return linhas;
+  }
+  const normCab = (s) => semAcento(s).replace(/[^a-z0-9]/g, '');
+  const REGRAS = [['nome', /^nome/], ['link_rede_social', /^(link|linkedin|redesocial|redessociais|perfil|url)/], ['seguidores', /seguid|followers/], ['email', /mail/], ['observacoes', /^observ|^obs/], ['rede_captacao', /capta/], ['como_cheguei', /comochegu|^origem/], ['situacao', /^situa|^status/], ['data_reuniao', /^data/], ['horario_inicio', /inicio/], ['horario_fim', /^horariofim|^horafim|^fim/]];
+  const lerSituacao = (v) => ({ aenviar: 'a_enviar', enviar: 'a_enviar', enviado: 'enviado', respondeu: 'respondeu', proposta: 'proposta', fechado: 'fechado', seminteresse: 'sem_interesse' })[normCab(v)] || 'a_enviar';
+  const lerData = (v) => { v = String(v || '').trim(); let m = v.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/); if (m) return m[3] + '-' + pad(+m[2]) + '-' + pad(+m[1]); m = v.match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? m[0] : null; };
+  const lerHora = (v) => { const m = String(v || '').trim().match(/^(\d{1,2})\s*[:h]\s*(\d{2})/i); return m && +m[1] < 24 && +m[2] < 60 ? pad(+m[1]) + ':' + m[2] : null; };
+  const lerSeguidores = (v) => {
+    const s = String(v || '').toLowerCase().trim(); if (!s) return null;
+    const k = s.match(/^(\d+(?:[.,]\d+)?)\s*(k|mil)\b/); if (k) return Math.round(parseFloat(k[1].replace(',', '.')) * 1000);
+    const d = s.replace(/\D/g, ''); return d ? parseInt(d, 10) : null;
+  };
+
+  async function importarCSV(arquivo) {
+    let linhas;
+    try {
+      const buf = await arquivo.arrayBuffer();
+      let txt = new TextDecoder('utf-8').decode(buf); if (txt.includes('�')) txt = new TextDecoder('windows-1252').decode(buf);
+      linhas = lerCSV(txt);
+    } catch (e) { toast('Não consegui ler esse arquivo.', true); return; }
+    if (linhas.length < 2) { toast('O arquivo está vazio ou só tem o cabeçalho.', true); return; }
+    const mapa = {}, ignoradas = [];
+    linhas[0].forEach((h, i) => { const r = REGRAS.find((x) => x[1].test(normCab(h))); if (r && !(r[0] in mapa)) mapa[r[0]] = i; else if (String(h).trim()) ignoradas.push(h.trim()); });
+    if (!('nome' in mapa)) { toast('Não achei a coluna do nome. A primeira linha precisa ter "Nome do possível aluno".', true); return; }
+    const existentes = new Set(S.pros.map((p) => String(p.link_rede_social || '').trim().toLowerCase()).filter(Boolean)), vistos = new Set(), novos = [];
+    let semNome = 0, repetidos = 0;
+    linhas.slice(1).forEach((l) => {
+      if (l.every((c) => !String(c).trim())) return;
+      const g = (k) => k in mapa ? String(l[mapa[k]] == null ? '' : l[mapa[k]]).trim() : '';
+      const nome = g('nome'); if (!nome) { semNome++; return; }
+      const link = g('link_rede_social'), ch = link.toLowerCase();
+      if (ch && (existentes.has(ch) || vistos.has(ch))) { repetidos++; return; }
+      if (ch) vistos.add(ch);
+      novos.push({ nome: nome, link_rede_social: link || null, seguidores: lerSeguidores(g('seguidores')), email: g('email') || null, observacoes: g('observacoes') || null, rede_captacao: g('rede_captacao') || null, como_cheguei: g('como_cheguei') || null, situacao: lerSituacao(g('situacao')), data_reuniao: lerData(g('data_reuniao')), horario_inicio: lerHora(g('horario_inicio')), horario_fim: lerHora(g('horario_fim')) });
+    });
+    if (novos.length > 2000) { toast('O arquivo tem mais de 2000 linhas. Divida em partes menores.', true); return; }
+    const amostra = novos.slice(0, 5);
+    const ov = abrirJanela('<h2>Importar planilha</h2><p style="margin-bottom:10px">Encontrei <b>' + novos.length + '</b> ' + (novos.length === 1 ? 'pessoa' : 'pessoas') + ' para importar' + (repetidos ? ', ' + repetidos + (repetidos === 1 ? ' já existia' : ' já existiam') + ' (mesmo link)' : '') + (semNome ? ', ' + semNome + (semNome === 1 ? ' sem nome (ignorada)' : ' sem nome (ignoradas)') : '') + '.</p>' + (ignoradas.length ? '<p class="mut" style="margin-bottom:10px;font-size:.8rem">Colunas ignoradas: ' + ignoradas.map(esc).join(', ') + '.</p>' : '') + (amostra.length ? '<div class="rolagem" style="margin-bottom:12px"><table style="min-width:0"><thead><tr><th>Nome</th><th>Situação</th><th>Seguidores</th></tr></thead><tbody>' + amostra.map((x) => '<tr><td>' + esc(x.nome) + '</td><td>' + esc(rotPst(x.situacao)) + '</td><td>' + (x.seguidores == null ? '-' : x.seguidores) + '</td></tr>').join('') + '</tbody></table></div><p class="mut" style="font-size:.78rem">Mostrando as primeiras ' + amostra.length + '. Conferiu? Clique em Importar.</p>' : '') + '<div class="jan-bt"><button class="btn sec" data-cancelar>Cancelar</button>' + (novos.length ? '<button class="btn" data-ok>Importar ' + novos.length + '</button>' : '') + '</div>');
+    $('[data-cancelar]', ov).onclick = fecharJanela;
+    const ok = $('[data-ok]', ov);
+    if (ok) ok.onclick = async () => {
+      ok.disabled = true; ok.textContent = 'Importando...';
+      let feitos = 0;
+      for (let i = 0; i < novos.length; i += 200) {
+        const lote = novos.slice(i, i + 200);
+        const e = await (async () => { try { const r = await sb.from('prospeccao').insert(lote); return r.error ? traduzErro(r.error, 'prospeccao') : null; } catch (x) { return traduzErro(x, 'prospeccao'); } })();
+        if (e) { await recarregar('pros'); render(); fecharJanela(); toast('Importei ' + feitos + ' e parei. ' + e, true); return; }
+        feitos += lote.length;
+      }
+      await recarregar('pros'); render(); fecharJanela(); toast('Importadas ' + feitos + ' pessoas!');
+    };
+  }
+
+  function renderProspeccao() {
+    const redes = Array.from(new Set(S.pros.map((p) => String(p.rede_captacao || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'pt'));
+    painel().innerHTML =
+      '<div class="faixa-k" id="pCont"></div>' +
+      '<div class="barra"><input type="search" id="pBusca" placeholder="Buscar por nome, e-mail ou link" aria-label="Buscar" value="' + esc(pFiltro.q) + '">' +
+      '<select id="pSit" aria-label="Filtrar por situação"><option value="">Todas as situações</option>' + PST.map((s) => '<option value="' + s[0] + '"' + (pFiltro.sit === s[0] ? ' selected' : '') + '>' + s[1] + '</option>').join('') + '</select>' +
+      '<select id="pRede" aria-label="Filtrar por rede de captação"><option value="">Todas as redes</option>' + redes.map((r) => '<option' + (pFiltro.rede === r ? ' selected' : '') + '>' + esc(r) + '</option>').join('') + '</select>' +
+      '<select id="pReu" aria-label="Filtrar por reunião"><option value="">Reunião: todas</option><option value="com"' + (pFiltro.reuniao === 'com' ? ' selected' : '') + '>Com reunião marcada</option><option value="sem"' + (pFiltro.reuniao === 'sem' ? ' selected' : '') + '>Sem reunião</option></select></div>' +
+      '<div class="barra"><button class="btn sec" id="pModelo">Baixar modelo CSV</button><button class="btn sec" id="pCsv">Baixar base (CSV)</button><span class="esp"></span><button class="btn sec" id="pImp">Importar CSV</button><input type="file" id="pArq" accept=".csv,text/csv,text/plain" hidden><button class="btn" id="pNova">Adicionar</button></div>' +
+      '<div class="rolagem"><table style="min-width:1180px"><thead><tr><th>Nome</th><th>Redes</th><th style="text-align:right">Seguidores</th><th>E-mail</th><th>Captação</th><th>Como cheguei</th><th>Situação</th><th>Reunião</th><th>Observações</th></tr></thead><tbody id="tbPros"></tbody></table></div>';
+    contadoresPros(); tabelaPros();
+    $('#pCont').onclick = (e) => { const b = e.target.closest('[data-cont]'); if (!b) return; pFiltro.sit = b.dataset.cont; $('#pSit').value = pFiltro.sit; contadoresPros(); tabelaPros(); };
+    $('#pBusca').oninput = (e) => { pFiltro.q = e.target.value; tabelaPros(); };
+    $('#pSit').onchange = (e) => { pFiltro.sit = e.target.value; contadoresPros(); tabelaPros(); };
+    $('#pRede').onchange = (e) => { pFiltro.rede = e.target.value; tabelaPros(); };
+    $('#pReu').onchange = (e) => { pFiltro.reuniao = e.target.value; tabelaPros(); };
+    $('#pNova').onclick = () => abrirProspecto(null);
+    $('#pImp').onclick = () => $('#pArq').click();
+    $('#pArq').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) importarCSV(f); };
+    $('#pModelo').onclick = () => baixarCSV('modelo-prospeccao.csv', CAB_PROS, [['(exemplo) Nome Sobrenome', 'https://www.linkedin.com/in/exemplo', '1200', 'não encontrado', 'Primeira experiência em dados há 8 meses', 'LinkedIn', 'Busca por analista de dados júnior', 'A enviar', '25/09/2026', '14:00', '15:00']], [1, 2, 8, 9, 10]);
+    $('#pCsv').onclick = () => baixarCSV('prospeccao.csv', CAB_PROS, prosFiltrados().map(linhaCSV), [1, 2, 8, 9, 10]);
+    $('#tbPros').onclick = (e) => {
+      if (e.target.closest('[data-fora]')) return;
+      const tr = e.target.closest('tr[data-id]'); if (!tr) return;
+      const st = e.target.closest('[data-status]'); if (st) { menuStatus(st, tr.dataset.id); return; }
+      const av = e.target.closest('[data-avanca]'); if (av) { mudarStatus(tr.dataset.id, av.dataset.avanca); return; }
+      abrirProspecto(S.pros.find((x) => x.id === tr.dataset.id));
+    };
+  }
+
+  /* =========================================================
      NAVEGAÇÃO
      ========================================================= */
-  const ABAS = { portfolio: ['Portfólio', renderPortfolio], marcas: ['Marcas', renderMarcas], calendario: ['Calendário', renderCalendario], campanhas: ['Campanhas', renderCampanhas], checklist: ['Checklist portfólio', renderChecklist] };
+  const ABAS = { portfolio: ['Portfólio', renderPortfolio], marcas: ['Marcas', renderMarcas], calendario: ['Calendário', renderCalendario], campanhas: ['Campanhas', renderCampanhas], checklist: ['Checklist portfólio', renderChecklist], prospeccao: ['Prospecção de alunos', renderProspeccao] };
   let aba = 'portfolio';
   function render() {
     try { ABAS[aba][1](); }
@@ -613,7 +796,7 @@
 
   /* ---------- começa ---------- */
   painel().innerHTML = vazio('Carregando seus dados...');
-  const [v, m, c, k, mk, vi] = await Promise.all(['videos', 'marcas', 'cal', 'camp', 'marcados', 'visitas'].map(carregar));
-  S.videos = v; S.marcas = m; S.cal = c; S.camp = k; S.marcados = new Set(mk.map((x) => x.chave)); S.visitas = vi;
+  const [v, m, c, k, mk, vi, pr] = await Promise.all(['videos', 'marcas', 'cal', 'camp', 'marcados', 'visitas', 'pros'].map(carregar));
+  S.videos = v; S.marcas = m; S.cal = c; S.camp = k; S.marcados = new Set(mk.map((x) => x.chave)); S.visitas = vi; S.pros = pr;
   irPara(location.hash.replace('#', ''));
 })();
