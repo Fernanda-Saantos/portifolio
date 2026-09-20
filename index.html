@@ -134,6 +134,20 @@ header.top{position:fixed;inset:0 0 auto 0;z-index:50;background:rgba(7,13,20,.9
 .work-b small{font-family:var(--f-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--amber)}
 .work-b h3{font-size:1.02rem;line-height:1.25;margin-top:4px}
 .work[hidden]{display:none}
+.case{display:grid;grid-template-columns:5fr 4fr;gap:0;overflow:hidden;margin-bottom:40px}
+.case-b{padding:34px 34px 32px;display:flex;flex-direction:column;gap:14px}
+.case-b h3{font-size:1.6rem;line-height:1.15}
+.case-b p{color:var(--muted);line-height:1.6}
+.case-b p b{color:var(--bone);font-weight:600}
+.case-tags{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:2px 0 4px}
+.case-tags li{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:3px;padding:5px 9px;color:var(--muted)}
+.case-act{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+.case-img{position:relative;min-height:320px;background:#0d1420}
+.case-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left center}
+.case-act [hidden]{display:none}
+.case-note{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+@media(max-width:900px){.case{grid-template-columns:1fr}.case-img{min-height:220px;order:-1}.case-b{padding:24px 20px}}
+
 .work.pop{animation:pop .4s ease}
 @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
 
@@ -309,6 +323,21 @@ footer small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);width
   <div class="wrap">
     <p class="kicker">03 · Projetos por área</p>
     <h2>Escolha o destino e veja o que já entreguei.</h2>
+    <article class="card case" id="caseObras">
+      <div class="case-b">
+        <p class="kicker">Projeto em foco · Power BI</p>
+        <h3>Programação semanal de obras</h3>
+        <p><b>A dor:</b> em obra, manutenção e facilities, a programação da semana costuma morar numa planilha que só quem a montou consegue ler. Fiscais, encarregados e gestores não enxergam o que está previsto para cada dia, quem faz o quê nem quanto do planejado foi executado. O resultado é reunião sem visão comum, mão de obra ociosa que ninguém percebe e apontamento atrasado.</p>
+        <p><b>Para que serve:</b> o painel lê as planilhas semanais como elas já são e mostra, em uma única tela, o programado x realizado, o HH subutilizado, as pendências de apontamento e o calendário do mês por fiscal. Assista à navegação pelas semanas, pelos filtros e pelo calendário.</p>
+        <ul class="case-tags"><li>Power BI</li><li>Power Query</li><li>DAX</li><li>Excel</li></ul>
+        <div class="case-act">
+          <a class="btn btn-solid" id="caseLink" href="#" target="_blank" rel="noopener" hidden>Ver demonstração em vídeo →</a>
+          <a class="btn btn-line" id="caseDoc" href="#" target="_blank" rel="noopener" hidden>Ver documentação</a>
+        </div>
+        <span class="case-note">Empresa, obras e dados fictícios, criados para portfólio.</span>
+      </div>
+      <div class="case-img"><img src="projeto-obras-capa.jpg" alt="Prévia do painel de programação semanal: calendário de atividades da Baluarte Engenharia" loading="lazy" decoding="async"></div>
+    </article>
     <div class="filters" id="filters" role="group" aria-label="Filtrar projetos por área"></div>
     <div class="works" id="works" aria-live="polite"></div>
   </div>
@@ -464,6 +493,10 @@ let WORKS = [
   { niche: "Automação",  title: "Projeto 08 · Empresa 08", cover: "" }
 ];
 
+/* Projeto em foco (Programação semanal de obras). Cole aqui o link do vídeo de demonstração (YouTube não listado, Loom ou arquivo)
+   e, se quiser, o link da documentação (Notion publicado ou repositório). Vazio = o botão não aparece. */
+const CASE_OBRAS = { video: "https://youtu.be/nrFcHTkubzc", documentacao: "" };
+
 /* Serviços (6). */
 const SERVICES = [
   { title: "Dashboards em Power BI", text: "Painéis claros e bonitos, com os indicadores certos para a sua equipe acompanhar o negócio." },
@@ -591,6 +624,11 @@ function desenharTrabalhos() {
 }
 desenharDestaques();
 desenharTrabalhos();
+/* Botões do projeto em foco */
+[['caseLink', CASE_OBRAS.video], ['caseDoc', CASE_OBRAS.documentacao]].forEach(([id, url]) => {
+  const el = $(id); if (el && /^https?:\/\//i.test(url)) { el.href = url; el.hidden = false; }
+});
+
 $('filters').addEventListener('click', (e) => {
   const b = e.target.closest('.chip'); if (!b) return;
   document.querySelectorAll('#filters .chip').forEach((c) => c.setAttribute('aria-pressed', c === b));
